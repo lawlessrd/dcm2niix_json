@@ -70,18 +70,18 @@ class Module_dcm2niix_json(ScanModule):
         """
 
         # Check output
-        if XnatUtils.has_resource(cscan, 'NIFTI'):
-            LOGGER.debug('Has NIFTI')
-            return False
+        #if XnatUtils.has_resource(cscan, 'NIFTI'):
+        #    LOGGER.debug('Has NIFTI')
+        #    return False
 
         # Check input
-        if not XnatUtils.has_resource(cscan, 'DICOM'):
-            LOGGER.debug('No DICOM resource')
-            return False
+        #if not XnatUtils.has_resource(cscan, 'DICOM'):
+        #    LOGGER.debug('No DICOM resource')
+        #    return False
 
-        if XnatUtils.is_cscan_unusable(cscan):
-            LOGGER.debug('Unusable scan')
-            return False
+        #if XnatUtils.is_cscan_unusable(cscan):
+        #    LOGGER.debug('Unusable scan')
+        #    return False
 
         return True
 
