@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 proj ='LANDMAN_UPGRAD'
 subj = '229415'
 sess = '229415'
-scan = 'T1W_3D_TFE'
+scan = '101'
 
 with XnatUtils.get_interface() as xnat:
 
@@ -29,12 +29,7 @@ with XnatUtils.get_interface() as xnat:
 
 
     m = Module_dcm2niix_json.Module_dcm2niix_json(
-	    scantype_filter = 'T1W_3D_TFE',email = 'r.dylan.lawless@vumc.org')
+        scantype_filter = 'T1W_3D_TFE',email = 'r.dylan.lawless@vumc.org')
     m.prerun()
     m.needs_run(csess, xnat)
     m.run(scan_info,scan_obj)
-
-
-
-
-

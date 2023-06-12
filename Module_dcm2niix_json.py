@@ -9,6 +9,7 @@ import subprocess as sb
 import shutil
 from string import Template
 import tempfile
+import json
 
 LOGGER = logging.getLogger('dax')
 
@@ -70,18 +71,18 @@ class Module_dcm2niix_json(ScanModule):
         """
 
         # Check output
-        #if XnatUtils.has_resource(cscan, 'NIFTI'):
-        #    LOGGER.debug('Has NIFTI')
-        #    return False
+        if XnatUtils.has_resource(cscan, 'JSON'):
+            LOGGER.debug('Has JSON')
+            return False
 
         # Check input
-        #if not XnatUtils.has_resource(cscan, 'DICOM'):
-        #    LOGGER.debug('No DICOM resource')
-        #    return False
+        if not XnatUtils.has_resource(cscan, 'DICOM'):
+            LOGGER.debug('No DICOM resource')
+            return False
 
-        #if XnatUtils.is_cscan_unusable(cscan):
-        #    LOGGER.debug('Unusable scan')
-        #    return False
+        if XnatUtils.is_cscan_unusable(cscan):
+            LOGGER.debug('Unusable scan')
+            return False
 
         return True
 
@@ -146,21 +147,13 @@ class Module_dcm2niix_json(ScanModule):
             if not os.path.isfile(fpath):
                 continue
 
-            if fpath.lower().endswith('.bval') and not len(scan_obj.resource('BVAL').files().get()) > 0:
-                fpath = sanitize_filename(fpath)
-                bval_path = fpath
-            elif fpath.lower().endswith('.bvec') and not len(scan_obj.resource('BVEC').files().get()) > 0:
-                fpath = sanitize_filename(fpath)
-                bvec_path = fpath
-            elif fpath.endswith('ADC.nii.gz'):
-                LOGGER.warn('ignoring ADC NIFTI:' + fpath)
-            elif fpath.lower().endswith('.json') and not len(scan_obj.resource('JSON').files().get()) > 0:
+            if fpath.lower().endswith('.json') and not len(scan_obj.resource('JSON').files().get()) > 0:
                 fpath = sanitize_filename(fpath)
                 json_path = fpath
 
         # Check
         success = self.check_outputs(
-            scan_info, bval_path, bvec_path)
+            scan_info, json_path)
 
         if not success:
             print('not successful?')
@@ -170,13 +163,13 @@ class Module_dcm2niix_json(ScanModule):
         #XnatUtils.upload_files_to_obj(
         #    nifti_list, scan_obj.resource('NIFTI'), remove=True)
 
-        if os.path.isfile(bval_path) and os.path.isfile(bvec_path):
+        #if os.path.isfile(bval_path) and os.path.isfile(bvec_path):
             # BVAL/BVEC
-            XnatUtils.upload_file_to_obj(
-                bval_path, scan_obj.resource('BVAL'), remove=True)
+        #    XnatUtils.upload_file_to_obj(
+        #        bval_path, scan_obj.resource('BVAL'), remove=True)
 
-            XnatUtils.upload_file_to_obj(
-                bvec_path, scan_obj.resource('BVEC'), remove=True)
+        #    XnatUtils.upload_file_to_obj(
+        #        bvec_path, scan_obj.resource('BVEC'), remove=True)
 
         if os.path.isfile(json_path):
             # JSON
@@ -189,18 +182,18 @@ class Module_dcm2niix_json(ScanModule):
         #        scan_info['scan_id']))
         #    self.log_warning_error('multiple NIFTI', scan_info)
 
-    def check_outputs(self, scan_info, nifti_list, bval, bvec):
+    def check_outputs(self, scan_info, json_path):
         """ Check outputs (opening nifti works)"""
-        #for nifti_fpath in nifti_list:
-        #    try:
-        #        nib.load(nifti_fpath)
-        #    except nib.ImageFileError:
-        #        LOGGER.warn(
-        #            '''dcm2niix:{}:{} is not NIFTI'''.format(
-        #                scan_info['scan_id'],
-        #                os.path.basename(nifti_fpath)))
-        #        self.log_warning_error(
-        #            'non-valid nifti created', scan_info, error=True)
-        #        return False
-        fprintf('Complete')
+        try:
+            json_obj = open(json_path)
+            json_data = json.load(json_obj)
+        except nib.ImageFileError:
+            LOGGER.warn(
+                '''dcm2niix:{}:{} is not JSON'''.format(
+                        scan_info['scan_id'],
+                        os.path.basename(json_path)))
+            self.log_warning_error(
+                    'non-valid json created', scan_info, error=True)
+                return False
+        
         return True
