@@ -194,6 +194,6 @@ class Module_dcm2niix_json(ScanModule):
                         os.path.basename(json_path)))
             self.log_warning_error(
                     'non-valid json created', scan_info, error=True)
-                return False
+            return False
         
         return True
